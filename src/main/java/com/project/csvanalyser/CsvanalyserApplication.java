@@ -1,13 +1,25 @@
 package com.project.csvanalyser;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import com.project.csvanalyser.cli.AnalyticsResult;
+import com.project.csvanalyser.cli.CliConfig;
+import com.project.csvanalyser.cli.CliParser;
+import com.project.csvanalyser.cli.CsvAnalyticsRunner;
+import com.project.csvanalyser.cli.ReportWriter;
 
-@SpringBootApplication
 public class CsvanalyserApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(CsvanalyserApplication.class, args);
+		CliConfig config = CliParser.parse(args);
+		if (config == null) {
+			CliParser.printHelp();
+			return;
+		}
+		try {
+			AnalyticsResult result = CsvAnalyticsRunner.run(config);
+			ReportWriter.write(result, config);
+		} catch (Exception e) {
+			System.err.println("Error: " + e.getMessage());
+			System.exit(1);
+		}
 	}
-
 }
