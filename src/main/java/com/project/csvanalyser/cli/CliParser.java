@@ -16,6 +16,7 @@ public final class CliParser {
     public static final String AGG = "--agg";
     public static final String TOP_N = "--top-n";
     public static final String OUTPUT = "--output";
+    public static final String REPORT = "--report";
     public static final String DELIMITER = "--delimiter";
     public static final String HEADER = "--header";
 
@@ -39,10 +40,11 @@ public final class CliParser {
         String topNMetric = getString(args, "--top-n-metric", "sum_amount");
         int topN = getInt(args, TOP_N, DEFAULT_TOP_N);
         Path output = getPath(args, OUTPUT, null);
+        Path report = getPath(args, REPORT, null);
         char delimiter = getDelimiter(args);
         boolean hasHeader = getBoolean(args, HEADER, DEFAULT_HEADER);
 
-        return new CliConfig(input, filter, groupBy, agg, topNMetric, topN, output, delimiter, hasHeader);
+        return new CliConfig(input, filter, groupBy, agg, topNMetric, topN, output, report, delimiter, hasHeader);
     }
 
     public static void printHelp() {
@@ -58,6 +60,7 @@ public final class CliParser {
         System.out.println("  --top-n <n>          Number of top groups to report (default: 10)");
         System.out.println("  --top-n-metric <name> Metric for top-N: count, sum_<col>, avg_<col>, etc. (default: sum_amount)");
         System.out.println("  --output <path>       Output JSON summary path (required)");
+        System.out.println("  --report <path>       Save human-readable report to file (.txt or .pdf)");
         System.out.println("  --delimiter <char>   CSV delimiter (default: ,)");
         System.out.println("  --header <true|false> First row is header (default: true)");
         System.out.println("  --help               Print this message");

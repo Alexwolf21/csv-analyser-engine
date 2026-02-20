@@ -37,7 +37,7 @@ class ReportWriterTest {
         AnalyticsResult result = new AnalyticsResult("input.csv", 2, 0, stateByGroup, topN, List.of("product"));
         Path out = dir.resolve("summary.json");
         CliConfig config = new CliConfig(Path.of("input.csv"), null, List.of("product"),
-                List.of("count", "sum(amount)"), "sum_amount", 10, out, ',', true);
+                List.of("count", "sum(amount)"), "sum_amount", 10, out, null, ',', true);
 
         PrintStream prevOut = System.out;
         try {

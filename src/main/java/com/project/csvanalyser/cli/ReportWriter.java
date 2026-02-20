@@ -8,6 +8,7 @@ import com.project.csvanalyser.aggregation.TopN;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -24,11 +25,25 @@ public final class ReportWriter {
     private static final ObjectMapper JSON = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
 
     public static void write(AnalyticsResult result, CliConfig config) throws IOException {
-        printConsoleReport(result, config);
+        String reportText = buildReportText(result, config);
+        System.out.print(reportText);
+        Path reportPath = config.getReportPath();
+        if (reportPath != null) {
+            String pathLower = reportPath.toString().toLowerCase();
+            if (pathLower.endsWith(".pdf")) {
+                PdfReportWriter.write(reportText, reportPath);
+            } else {
+                Files.writeString(reportPath, reportText);
+            }
+        }
         writeJsonSummary(result, config);
     }
 
-    private static void printConsoleReport(AnalyticsResult result, CliConfig config) {
+    /**
+     * Builds the human-readable report as a single string (same content as printed to console).
+     */
+    public static String buildReportText(AnalyticsResult result, CliConfig config) {
+        StringBuilder out = new StringBuilder();
         List<String> groupCols = result.getGroupByColumns();
         Map<GroupKey, AggregationState> stateByGroup = result.getStateByGroup();
         List<String> aggSpecs = config.getAggregationSpecs();
@@ -51,8 +66,8 @@ public final class ReportWriter {
                 }
                 keyPart.append(String.join(", ", parts));
             }
-            System.out.println(keyPart);
-            System.out.println("count: " + state.getCount());
+            out.append(keyPart).append("\n");
+            out.append("count: ").append(state.getCount()).append("\n");
             for (String spec : aggSpecs) {
                 String s = spec.trim();
                 if (s.equalsIgnoreCase("count")) continue;
@@ -61,20 +76,18 @@ public final class ReportWriter {
                     String op = m.group(1).toLowerCase();
                     String col = m.group(2);
                     String label = op + "(" + col + ")";
-                    if ("sum".equals(op)) System.out.println(label + ": " + formatNum(state.getSum(col)));
-                    else if ("avg".equals(op)) System.out.println(label + ": " + formatNum(state.getAvg(col)));
-                    else if ("min".equals(op)) System.out.println(label + ": " + (state.getMin(col) != null ? formatNum(state.getMin(col)) : "-"));
-                    else if ("max".equals(op)) System.out.println(label + ": " + (state.getMax(col) != null ? formatNum(state.getMax(col)) : "-"));
+                    if ("sum".equals(op)) out.append(label).append(": ").append(formatNum(state.getSum(col))).append("\n");
+                    else if ("avg".equals(op)) out.append(label).append(": ").append(formatNum(state.getAvg(col))).append("\n");
+                    else if ("min".equals(op)) out.append(label).append(": ").append(state.getMin(col) != null ? formatNum(state.getMin(col)) : "-").append("\n");
+                    else if ("max".equals(op)) out.append(label).append(": ").append(state.getMax(col) != null ? formatNum(state.getMax(col)) : "-").append("\n");
                 }
             }
-            System.out.println("---");
+            out.append("---\n");
         }
 
         List<TopN.TopNEntry> topN = result.getTopN();
         if (!topN.isEmpty()) {
-            String metricLabel = config.getTopNMetric().replace("_", "(").replaceFirst("([a-z]+)\\.?$", "$1)");
-            if (!metricLabel.contains("(")) metricLabel = metricLabel + " (by " + config.getTopNMetric() + ")";
-            System.out.println("TOP " + topN.size() + " (by " + config.getTopNMetric() + "):");
+            out.append("TOP ").append(topN.size()).append(" (by ").append(config.getTopNMetric()).append("):\n");
             for (int i = 0; i < topN.size(); i++) {
                 TopN.TopNEntry entry = topN.get(i);
                 StringBuilder line = new StringBuilder((i + 1) + ". ");
@@ -83,16 +96,16 @@ public final class ReportWriter {
                 } else {
                     List<String> parts = new ArrayList<>();
                     for (int j = 0; j < groupCols.size(); j++) {
-                        String col = groupCols.get(j);
                         String val = j < entry.getGroupKey().getValues().size() ? entry.getGroupKey().getValues().get(j) : "";
                         parts.add(val);
                     }
                     line.append(String.join(" — ", parts));
                 }
                 line.append(" — ").append(formatNum(entry.getMetricValue()));
-                System.out.println(line);
+                out.append(line).append("\n");
             }
         }
+        return out.toString();
     }
 
     private static String formatNum(double d) {

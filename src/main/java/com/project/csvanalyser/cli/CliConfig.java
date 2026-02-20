@@ -15,12 +15,13 @@ public final class CliConfig {
     private final String topNMetric;
     private final int topN;
     private final Path outputPath;
+    private final Path reportPath;
     private final char delimiter;
     private final boolean hasHeader;
 
     public CliConfig(Path inputPath, String filterExpression, List<String> groupByColumns,
                     List<String> aggregationSpecs, String topNMetric, int topN, Path outputPath,
-                    char delimiter, boolean hasHeader) {
+                    Path reportPath, char delimiter, boolean hasHeader) {
         this.inputPath = inputPath;
         this.filterExpression = filterExpression;
         this.groupByColumns = groupByColumns == null ? List.of() : List.copyOf(groupByColumns);
@@ -28,6 +29,7 @@ public final class CliConfig {
         this.topNMetric = topNMetric;
         this.topN = topN;
         this.outputPath = outputPath;
+        this.reportPath = reportPath;
         this.delimiter = delimiter;
         this.hasHeader = hasHeader;
     }
@@ -39,6 +41,7 @@ public final class CliConfig {
     public String getTopNMetric() { return topNMetric; }
     public int getTopN() { return topN; }
     public Path getOutputPath() { return outputPath; }
+    public Path getReportPath() { return reportPath; }
     public char getDelimiter() { return delimiter; }
     public boolean isHasHeader() { return hasHeader; }
 }

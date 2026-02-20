@@ -32,6 +32,7 @@ java -jar target/csv-analytics-0.1.0-SNAPSHOT.jar \
 |--------|-------------|---------|
 | `--input` | Input CSV file path (required) | - |
 | `--output` | Output JSON summary path (required) | - |
+| `--report` | Save human-readable report to file (use `.txt` or `.pdf` extension) | (none) |
 | `--filter` | Filter expression (see below) | (none) |
 | `--group-by` | Comma-separated group columns | (none → global) |
 | `--agg` | Aggregations: `count`, `sum(col)`, `avg(col)`, `min(col)`, `max(col)` | count |
@@ -52,6 +53,7 @@ Example: `region=="APAC" && amount>1000`
 ## Output
 
 - **Console:** Human-readable table of groups and aggregates, plus a “TOP N” section.
+- **Report file (optional):** Use `--report report.txt` or `--report report.pdf` to save the same report to a file for later viewing. PDF uses the OpenPDF library.
 - **JSON file:** `inputFile`, `totalRows`, `malformedRows`, `groups` (array of `groupKey` + aggregate fields), `topN` (array of group key + metric). Field names use underscores (e.g. `sum_amount`, `avg_amount`).
 
 ## Tests
