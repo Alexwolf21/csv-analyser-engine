@@ -1,0 +1,7 @@
+timestamp,product,region,amount,currency
+2026-02-01T09:01:23Z,WidgetA,APAC,1200,USD
+2026-02-01T09:05:00Z,WidgetB,EMEA,450,EUR
+2026-02-01T09:06:12Z,WidgetA,APAC,1500,USD
+malformed,line,that,should,be,skipped
+2026-02-01T10:00:00Z,WidgetC,APAC,800,USD
+2026-02-01T10:15:00Z,WidgetA,EMEA,200,EUR
