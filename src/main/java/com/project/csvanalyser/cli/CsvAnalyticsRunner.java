@@ -54,7 +54,7 @@ public final class CsvAnalyticsRunner {
         AtomicLong totalParsedRows = new AtomicLong(0);
         try (Stream<Map<String, String>> stream = parseResult.getRecordStream()) {
             stream.peek(row -> totalParsedRows.incrementAndGet())
-                    .filter(filter)
+                    .filter(filter::test)
                     .forEach(aggregator::accept);
         }
 
@@ -74,7 +74,4 @@ public final class CsvAnalyticsRunner {
                 config.getGroupByColumns()
         );
     }
-</think>
-Fixing the runner: counting total rows correctly.
-<｜tool▁calls▁begin｜><｜tool▁call▁begin｜>
-StrReplace
+}
