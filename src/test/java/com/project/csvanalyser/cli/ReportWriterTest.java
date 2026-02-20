@@ -7,6 +7,9 @@ import com.project.csvanalyser.aggregation.TopN;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -36,7 +39,13 @@ class ReportWriterTest {
         CliConfig config = new CliConfig(Path.of("input.csv"), null, List.of("product"),
                 List.of("count", "sum(amount)"), "sum_amount", 10, out, ',', true);
 
-        ReportWriter.write(result, config);
+        PrintStream prevOut = System.out;
+        try {
+            System.setOut(new PrintStream(new ByteArrayOutputStream(), false, StandardCharsets.UTF_8));
+            ReportWriter.write(result, config);
+        } finally {
+            System.setOut(prevOut);
+        }
 
         assertTrue(Files.exists(out));
         @SuppressWarnings("unchecked")
