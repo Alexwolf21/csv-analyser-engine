@@ -25,9 +25,12 @@ public final class AggregationState {
             } catch (NumberFormatException e) {
                 continue;
             }
-            sumByColumn.merge(a.getColumn(), value, Double::sum);
-            minByColumn.merge(a.getColumn(), value, (x, y) -> Math.min(x, y));
-            maxByColumn.merge(a.getColumn(), value, (x, y) -> Math.max(x, y));
+            switch (a.getOp()) {
+                case SUM, AVG -> sumByColumn.merge(a.getColumn(), value, Double::sum);
+                case MIN -> minByColumn.merge(a.getColumn(), value, (x, y) -> Math.min(x, y));
+                case MAX -> maxByColumn.merge(a.getColumn(), value, (x, y) -> Math.max(x, y));
+                default -> { }
+            }
         }
     }
 
